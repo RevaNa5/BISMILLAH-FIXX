@@ -37,10 +37,10 @@
                 
                 <!-- Buttons -->
                 <div class="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
-                    <a href="/kegiatan" class="bg-emerald-500 text-white px-8 py-3.5 lg:py-4 rounded-full font-bold text-sm lg:text-base hover:bg-emerald-400 transition-all duration-300 shadow-[0_8px_20px_rgba(16,185,129,0.3)] transform hover:-translate-y-1">
+                    <a href="/informasi" class="bg-emerald-500 text-white px-8 py-3.5 lg:py-4 rounded-full font-bold text-sm lg:text-base hover:bg-emerald-400 transition-all duration-300 shadow-[0_8px_20px_rgba(16,185,129,0.3)] transform hover:-translate-y-1">
                         Kenal Lebih Dekat
                     </a>
-                    <a href="/informasi" class="bg-[#2a2f38]/80 backdrop-blur-md text-white border border-white/20 px-8 py-3.5 lg:py-4 rounded-full font-bold text-sm lg:text-base hover:bg-[#373e4a] transition-all duration-300 shadow-lg transform hover:-translate-y-1">
+                    <a href="/kegiatan" class="bg-[#2a2f38]/80 backdrop-blur-md text-white border border-white/20 px-8 py-3.5 lg:py-4 rounded-full font-bold text-sm lg:text-base hover:bg-[#373e4a] transition-all duration-300 shadow-lg transform hover:-translate-y-1">
                         Lihat Kegiatan
                     </a>
                 </div>
@@ -57,8 +57,8 @@
             <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Divisi Aktif</div>
         </div>
         <div class="bg-[#1f242e]/90 backdrop-blur-lg border border-white/5 rounded-2xl p-6 text-center shadow-xl hover:-translate-y-2 transition-transform duration-300">
-            <div class="text-3xl font-black text-white mb-1">{{ \App\Models\Member::whereNotNull('division_id')->count() }}</div>
-            <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Anggota</div>
+            <div class="text-3xl font-black text-white mb-1">{{ \App\Models\Member::count() }}</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Total Anggota</div>
         </div>
         <div class="bg-[#1f242e]/90 backdrop-blur-lg border border-white/5 rounded-2xl p-6 text-center shadow-xl hover:-translate-y-2 transition-transform duration-300">
             <div class="text-3xl font-black text-emerald-400 mb-1">20</div>
@@ -79,8 +79,8 @@
             <div class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Divisi Aktif</div>
         </div>
         <div class="bg-pikr-darkgreen/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 text-center shadow-lg">
-            <div class="text-3xl font-black text-white mb-1">{{ \App\Models\Member::whereNotNull('division_id')->count() }}</div>
-            <div class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Anggota</div>
+            <div class="text-3xl font-black text-white mb-1">{{ \App\Models\Member::count() }}</div>
+            <div class="text-[10px] text-gray-400 uppercase tracking-wider font-medium">Total Anggota</div>
         </div>
         <div class="bg-pikr-darkgreen/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 text-center shadow-lg">
             <div class="text-3xl font-black text-pikr-accent mb-1">20</div>

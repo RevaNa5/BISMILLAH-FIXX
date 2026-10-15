@@ -347,5 +347,6 @@ class DatabaseSeeder extends Seeder
         $this->call(MasterMemberSeeder::class);
         $this->call(MembersTableSeeder::class);
         $this->call(TaskSeeder::class);
+        $this->call(FinanceSeeder::class);
     }
 }

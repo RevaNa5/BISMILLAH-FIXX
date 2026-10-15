@@ -114,6 +114,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Khusus Bendahara & Ketua
     Route::middleware('can:manage_finance')->group(function () {
         Route::post('/kas', [DueController::class, 'store'])->name('kas.store');
+        Route::put('/kas/{due}', [DueController::class, 'update'])->name('kas.update');
+        Route::delete('/kas/{due}', [DueController::class, 'destroy'])->name('kas.destroy');
+        Route::get('/kas/export', [DueController::class, 'export'])->name('kas.export');
         Route::get('/kas/verifikasi', [PaymentController::class, 'index'])->name('payments.index');
         Route::post('/kas/verifikasi/{payment}', [PaymentController::class, 'verify'])->name('payments.verify');
     });

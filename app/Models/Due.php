@@ -10,11 +10,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Due extends Model
 {
     use HasFactory;
+
     protected $guarded = [];
 
     public function period(): BelongsTo
     {
         return $this->belongsTo(OrganizationPeriod::class, 'organization_period_id');
+    }
+
+    public function targetDivision(): BelongsTo
+    {
+        return $this->belongsTo(Division::class, 'target_division_id');
     }
 
     public function payments(): HasMany

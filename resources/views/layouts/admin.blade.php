@@ -134,10 +134,12 @@
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg></x-slot>
                             Peserta & Presensi
                         </x-sidebar-link>
-                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.index')">
+                        @can('manage_finance')
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*') || request()->routeIs('payments.*')">
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></x-slot>
-                            Keuangan Kas & Iuran
+                            Tagihan/Kas
                         </x-sidebar-link>
+                        @endcan
                         <x-sidebar-link :href="route('feature.surat_dokumen')" :active="request()->routeIs('feature.surat_dokumen*')">
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></x-slot>
                             Surat & Dokumen Resmi
@@ -205,6 +207,10 @@
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg></x-slot>
                             Task Board Organisasi
                         </x-sidebar-link>
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*')">
+                            <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></x-slot>
+                            Tagihan Saya
+                        </x-sidebar-link>
                     </div>
                 </div>
                 @endunlessrole
@@ -221,9 +227,9 @@
                         Kebendaharaan & Kas
                     </h3>
                     <div class="space-y-1">
-                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.index')">
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*') || request()->routeIs('payments.*')">
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></x-slot>
-                            Kelola Tagihan & Kas
+                            Tagihan/Kas
                         </x-sidebar-link>
                         <x-sidebar-link :href="route('payments.index')" :active="request()->routeIs('payments.index')">
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></x-slot>
@@ -269,6 +275,10 @@
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg></x-slot>
                             Daftar Ulang Anggota
                         </x-sidebar-link>
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*')">
+                            <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></x-slot>
+                            Tagihan Saya
+                        </x-sidebar-link>
                     </div>
                 </div>
                 @endunlessrole
@@ -292,6 +302,10 @@
                         <x-sidebar-link :href="route('feature.surat_dokumen', ['tab' => 'dispensasi'])" :active="request()->routeIs('feature.surat_dokumen*')">
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg></x-slot>
                             Surat & Dokumen Kerjasama
+                        </x-sidebar-link>
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*')">
+                            <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></x-slot>
+                            Tagihan Saya
                         </x-sidebar-link>
                     </div>
                 </div>
@@ -321,6 +335,10 @@
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg></x-slot>
                             Desain Konten & Media
                         </x-sidebar-link>
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*')">
+                            <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></x-slot>
+                            Tagihan Saya
+                        </x-sidebar-link>
                     </div>
                 </div>
                 @endunlessrole
@@ -349,6 +367,10 @@
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></x-slot>
                             Laporan Penjualan & Modal
                         </x-sidebar-link>
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*')">
+                            <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></x-slot>
+                            Tagihan Saya
+                        </x-sidebar-link>
                     </div>
                 </div>
                 @endunlessrole
@@ -376,6 +398,10 @@
                         <x-sidebar-link :href="route('feature.pending', 'Data Klien')" :active="request()->is('feature/Data*')">
                             <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></x-slot>
                             Data Klien & Catatan Sesi
+                        </x-sidebar-link>
+                        <x-sidebar-link :href="route('kas.index')" :active="request()->routeIs('kas.*')">
+                            <x-slot name="icon"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg></x-slot>
+                            Tagihan Saya
                         </x-sidebar-link>
                     </div>
                 </div>

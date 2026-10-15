@@ -193,7 +193,7 @@
 
     <!-- Main Stats Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        @if(array_intersect(['ADMIN', 'KETUA', 'PEMBINA', 'SEKRETARIS'], $roles))
+        @if(array_intersect(['ADMIN', 'KETUA', 'WAKIL_KETUA', 'PEMBINA', 'PELATIH', 'SEKRETARIS', 'BENDAHARA'], $roles))
             <x-stat-card title="Total Anggota" value="{{ $stats['total_members'] ?? 0 }}" color="cyan">
                 <x-slot name="icon">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -221,26 +221,180 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </x-slot>
             </x-stat-card>
-            <x-stat-card title="Kehadiran" value="95%" color="lime">
+            <x-stat-card title="Kehadiran" value="{{ $stats['attendance_rate'] ?? '100%' }}" color="lime">
                 <x-slot name="icon">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
                 </x-slot>
             </x-stat-card>
         @endif
         
-        @if(array_intersect(['BENDAHARA', 'KETUA', 'ADMIN'], $roles))
-            <x-glowing-stat-card title="Saldo Kas Aktif" value="Rp {{ number_format($stats['cash_balance'] ?? 0, 0, ',', '.') }}" subtitle="Total pemasukan terkini">
+        @if(array_intersect(['BENDAHARA', 'KETUA', 'ADMIN', 'WAKIL_KETUA', 'PEMBINA'], $roles))
+            <x-glowing-stat-card title="Saldo Kas Aktif" value="Rp {{ number_format($stats['cash_balance'] ?? 0, 0, ',', '.') }}" subtitle="Dana kas resmi terverifikasi">
                 <x-slot name="icon">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </x-slot>
             </x-glowing-stat-card>
         @else
-            <x-glowing-stat-card title="Tagihan Belum Lunas" value="{{ $stats['my_unpaid_dues'] ?? 0 }} Tagihan" subtitle="Status: {{ ($stats['my_unpaid_dues'] ?? 0) > 0 ? 'Perlu Dibayar' : 'Aman' }}" gradient="from-blue-600 to-indigo-500">
+            <x-glowing-stat-card title="Tagihan Belum Lunas" value="{{ $stats['my_unpaid_dues'] ?? 0 }} Tagihan" subtitle="{{ ($stats['my_unpaid_dues'] ?? 0) > 0 ? 'Rp ' . number_format($stats['my_unpaid_nominal'] ?? 0, 0, ',', '.') . ' Perlu Dibayar' : 'Semua Tagihan Lunas' }}" gradient="{{ ($stats['my_unpaid_dues'] ?? 0) > 0 ? 'from-amber-600 to-yellow-500' : 'from-emerald-600 to-teal-500' }}">
                 <x-slot name="icon">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </x-slot>
             </x-glowing-stat-card>
         @endif
+    </div>
+
+    <!-- Synchronized Finance Section -->
+    @if($isFinanceManager)
+        <!-- Ringkasan Keuangan Kas & Tagihan (Pengurus Berwenang) -->
+        <div class="bg-[#121B2D]/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-emerald-500/20 relative overflow-hidden group">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">Pusat Keuangan Organisasi</span>
+                    </div>
+                    <h3 class="text-xl md:text-2xl font-extrabold text-white tracking-tight">Ringkasan Kas & Tagihan PIK-R SKAKMATT</h3>
+                </div>
+                <a href="{{ route('kas.index') }}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all flex items-center gap-1.5">
+                    Buka Menu Tagihan/Kas
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </a>
+            </div>
+
+            <!-- Grid Statistik Pengurus -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-[#0B1221] border border-cyan-500/20 rounded-2xl p-4">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold block mb-1">Target Anggota</span>
+                    <p class="text-xl md:text-2xl font-black text-white">{{ $stats['total_target_bills'] ?? 0 }}</p>
+                    <span class="text-[10px] text-cyan-400">Total Nominal: Rp {{ number_format($stats['total_target_nominal'] ?? 0, 0, ',', '.') }}</span>
+                </div>
+                <div class="bg-[#0B1221] border border-emerald-500/30 rounded-2xl p-4">
+                    <span class="text-[10px] text-emerald-400 uppercase tracking-wider font-bold block mb-1">Dana Terverifikasi</span>
+                    <p class="text-xl md:text-2xl font-black text-emerald-400">Rp {{ number_format($stats['total_verified_funds'] ?? 0, 0, ',', '.') }}</p>
+                    <span class="text-[10px] text-slate-400">{{ $stats['verified_payments_count'] ?? 0 }} transaksi lunas</span>
+                </div>
+                <div class="bg-[#0B1221] border border-slate-700 rounded-2xl p-4">
+                    <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold block mb-1">Tagihan Belum Lunas</span>
+                    <p class="text-xl md:text-2xl font-black text-slate-200">{{ $stats['unpaid_bills_count'] ?? 0 }}</p>
+                    <span class="text-[10px] text-amber-400">Sisa: Rp {{ number_format($stats['unpaid_dues_nominal'] ?? 0, 0, ',', '.') }}</span>
+                </div>
+                <div class="bg-[#0B1221] border border-amber-500/30 rounded-2xl p-4 relative">
+                    <span class="text-[10px] text-amber-400 uppercase tracking-wider font-bold block mb-1">Menunggu Verifikasi</span>
+                    <p class="text-xl md:text-2xl font-black text-amber-400">{{ $stats['pending_payments_count'] ?? 0 }}</p>
+                    <span class="text-[10px] text-slate-400">Perlu ditinjau pengurus</span>
+                </div>
+            </div>
+
+            <!-- Riwayat Transaksi Kas Terbaru -->
+            @if(isset($stats['recent_cash_transactions']) && count($stats['recent_cash_transactions']) > 0)
+                <div class="border-t border-slate-700/60 pt-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Riwayat Mutasi Kas Terbaru
+                    </h4>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <tbody class="divide-y divide-slate-800">
+                                @foreach($stats['recent_cash_transactions'] as $tx)
+                                    <tr class="hover:bg-slate-800/30">
+                                        <td class="py-2.5 px-3 text-slate-400">{{ \Carbon\Carbon::parse($tx->transaction_date)->translatedFormat('d M Y') }}</td>
+                                        <td class="py-2.5 px-3">
+                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $tx->type === 'INCOME' ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-500/30' : 'bg-red-950/80 text-red-300 border border-red-500/30' }}">
+                                                {{ $tx->type === 'INCOME' ? '+ Masuk' : '- Keluar' }}
+                                            </span>
+                                        </td>
+                                        <td class="py-2.5 px-3 font-medium text-white">{{ $tx->description }}</td>
+                                        <td class="py-2.5 px-3 text-right font-black {{ $tx->type === 'INCOME' ? 'text-emerald-400' : 'text-red-400' }}">
+                                            {{ $tx->type === 'INCOME' ? '+' : '-' }} Rp {{ number_format($tx->amount, 0, ',', '.') }}
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            @endif
+        </div>
+    @endif
+
+    <!-- Ringkasan Tagihan & Kas Milik Anggota & Pengurus -->
+    <div class="bg-[#121B2D]/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 shadow-[0_10px_40px_rgba(0,0,0,0.5)] border border-cyan-500/20 relative overflow-hidden group">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-cyan-400">Keuangan Personal</span>
+                </div>
+                <h3 class="text-xl md:text-2xl font-extrabold text-white tracking-tight">Status Tagihan Kas Saya</h3>
+            </div>
+            <a href="{{ route('kas.index') }}" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-xs rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all flex items-center gap-1.5">
+                Bayar Sekarang
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+        </div>
+
+        <!-- 4 Status Metrics Personal -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-[#0B1221] border border-cyan-500/20 rounded-2xl p-4">
+                <span class="text-[10px] text-slate-400 uppercase tracking-wider font-bold block mb-1">Total Tagihan</span>
+                <p class="text-xl md:text-2xl font-black text-white">{{ $stats['my_total_dues'] ?? 0 }}</p>
+                <span class="text-[10px] text-cyan-400">Iuran untuk Anda</span>
+            </div>
+            <div class="bg-[#0B1221] border border-emerald-500/30 rounded-2xl p-4">
+                <span class="text-[10px] text-emerald-400 uppercase tracking-wider font-bold block mb-1">Sudah Lunas</span>
+                <p class="text-xl md:text-2xl font-black text-emerald-400">{{ $stats['my_paid_dues'] ?? 0 }}</p>
+                <span class="text-[10px] text-slate-400">Terverifikasi sah</span>
+            </div>
+            <div class="bg-[#0B1221] border border-amber-500/30 rounded-2xl p-4">
+                <span class="text-[10px] text-amber-400 uppercase tracking-wider font-bold block mb-1">Belum Dibayar</span>
+                <p class="text-xl md:text-2xl font-black text-amber-400">{{ $stats['my_unpaid_dues'] ?? 0 }}</p>
+                <span class="text-[10px] text-slate-400">Rp {{ number_format($stats['my_unpaid_nominal'] ?? 0, 0, ',', '.') }}</span>
+            </div>
+            <div class="bg-[#0B1221] border border-violet-500/30 rounded-2xl p-4">
+                <span class="text-[10px] text-violet-400 uppercase tracking-wider font-bold block mb-1">Menunggu Verifikasi</span>
+                <p class="text-xl md:text-2xl font-black text-violet-400">{{ $stats['my_pending_dues'] ?? 0 }}</p>
+                <span class="text-[10px] text-slate-400">Sedang diperiksa</span>
+            </div>
+        </div>
+
+        <!-- Daftar Tagihan Aktif -->
+        <div class="border-t border-slate-700/60 pt-4">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Daftar Tagihan Aktif Anda</h4>
+            <div class="space-y-3">
+                @forelse($myActiveDuesList as $item)
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-[#0B1221] border border-slate-800 rounded-2xl gap-3">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-500/30">{{ $item['due']->type }}</span>
+                                <h5 class="font-bold text-white text-sm">{{ $item['due']->title }}</h5>
+                            </div>
+                            <div class="text-[11px] text-slate-400">
+                                Tenggat: {{ $item['due']->deadline ? \Carbon\Carbon::parse($item['due']->deadline)->translatedFormat('d M Y') : 'Tidak ditentukan' }}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 justify-between sm:justify-end">
+                            <div class="text-left sm:text-right">
+                                <span class="text-xs text-slate-400 block">Nominal</span>
+                                <span class="font-bold text-emerald-400 text-sm">Rp {{ number_format($item['due']->amount, 0, ',', '.') }}</span>
+                            </div>
+                            <div>
+                                @if($item['status'] === 'LUNAS')
+                                    <span class="px-3 py-1 bg-emerald-950/60 border border-emerald-500/50 text-emerald-400 font-bold text-xs rounded-full">LUNAS</span>
+                                @elseif($item['status'] === 'MENUNGGU_VERIFIKASI')
+                                    <span class="px-3 py-1 bg-amber-950/60 border border-amber-500/50 text-amber-400 font-bold text-xs rounded-full">MENUNGGU VERIFIKASI</span>
+                                @else
+                                    <a href="{{ route('kas.index') }}" class="px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold text-xs rounded-xl shadow-md hover:scale-105 transition-all inline-block">
+                                        Bayar Sekarang
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-slate-500 text-xs py-3 text-center">Tidak ada tagihan aktif untuk akun Anda.</p>
+                @endforelse
+            </div>
+        </div>
     </div>
 
     <!-- Lower Section -->

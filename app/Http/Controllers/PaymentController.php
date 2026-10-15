@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CashTransaction;
 use App\Models\Due;
 use App\Models\Payment;
-use App\Models\CashTransaction;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -17,9 +16,9 @@ class PaymentController extends Controller
         $payments = Payment::with(['due', 'user', 'verifier'])
             ->latest()
             ->get();
-            
+
         return view('finance.verification', [
-            'payments' => $payments
+            'payments' => $payments,
         ]);
     }
 
@@ -27,7 +26,7 @@ class PaymentController extends Controller
     {
         $request->validate([
             'due_id' => 'required|exists:dues,id',
-            'payment_method' => 'required|in:TRANSFER,QRIS,CASH',
+            'payment_method' => 'required|in:TRANSFER,QRIS,CASH,EWALLET',
             'proof' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -36,22 +35,36 @@ class PaymentController extends Controller
 
         $path = $request->file('proof')->store('proofs', 'public');
 
+        $method = $request->payment_method;
+        if ($method === 'EWALLET') {
+            $method = 'TRANSFER';
+        }
+
         Payment::updateOrCreate(
             ['due_id' => $due->id, 'user_id' => $user->id],
             [
                 'amount_paid' => $due->amount,
                 'status' => 'MENUNGGU_VERIFIKASI',
-                'payment_method' => $request->payment_method,
+                'payment_method' => $method,
                 'proof_file' => $path,
                 'rejection_reason' => null,
             ]
         );
 
-        return redirect()->back()->with('success', 'Pembayaran berhasil dikirim dan menunggu verifikasi.');
+        return redirect()->route('kas.index')->with('success', 'Pembayaran berhasil dikirim dan menunggu verifikasi.');
     }
 
     public function verify(Request $request, Payment $payment)
     {
+        if ($request->has('action')) {
+            $mappedStatus = match ($request->action) {
+                'setujui' => 'LUNAS',
+                'tolak' => 'DITOLAK',
+                default => $request->action,
+            };
+            $request->merge(['status' => $mappedStatus]);
+        }
+
         $request->validate([
             'status' => 'required|in:LUNAS,DITOLAK',
             'rejection_reason' => 'required_if:status,DITOLAK|string|nullable',
@@ -68,19 +81,21 @@ class PaymentController extends Controller
             if ($request->status === 'LUNAS') {
                 // Ensure no duplicate transaction exists for this payment
                 $exists = CashTransaction::where('payment_id', $payment->id)->exists();
-                if (!$exists) {
+                if (! $exists) {
                     CashTransaction::create([
                         'type' => 'INCOME',
                         'amount' => $payment->amount_paid,
                         'payment_id' => $payment->id,
-                        'description' => 'Pembayaran ' . $payment->due->title . ' oleh ' . $payment->user->name,
+                        'description' => 'Pembayaran '.$payment->due->title.' oleh '.$payment->user->name,
                         'transaction_date' => now(),
                         'created_by' => Auth::id(),
                     ]);
                 }
+            } elseif ($request->status === 'DITOLAK') {
+                CashTransaction::where('payment_id', $payment->id)->delete();
             }
         });
 
-        return redirect()->back()->with('success', 'Status pembayaran berhasil diperbarui.');
+        return redirect()->route('kas.index')->with('success', 'Status pembayaran berhasil diperbarui.');
     }
 }
